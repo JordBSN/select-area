@@ -170,5 +170,3 @@ export const selectAreaImage = (img: HTMLImageElement, config: Partial<SelectAre
     resizeBottom.addEventListener('mousedown', e => setupResizeMouseDownEvent(e, {x: 0, y: 1}))
     resizeAll.addEventListener('mousedown', e => setupResizeMouseDownEvent(e, {x: 1, y: 1}));
 }
-
-selectAreaImage(document.getElementsByTagName('img')[0], {minHeight: 30})

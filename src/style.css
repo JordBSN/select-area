@@ -1,0 +1,61 @@
+#area {
+    background-color: red;
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    top: 0;
+    opacity: 0.5
+}
+
+#areaSelected {
+    position: absolute;
+    background-color: blue
+}
+
+
+#resizeRight {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 5px;
+    height: 100%;
+    cursor: ew-resize
+}
+
+#resizeLeft {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    cursor: ew-resize
+}
+
+#resizeTop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    cursor: ns-resize
+}
+
+#resizeBottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    cursor: ns-resize
+}
+
+#resizeAll {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    border: 1px solid black;
+    width: 12px;
+    height: 12px;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: nwse-resize
+}

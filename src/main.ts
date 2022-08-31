@@ -11,10 +11,19 @@ interface SelectAreaConfig {
     minWidth: number
 }
 
-export const selectArea = (img: HTMLImageElement, config: Partial<SelectAreaConfig>) => {
+export const selectAreaImage = (img: HTMLImageElement, config: Partial<SelectAreaConfig>) => {
 
     config.minHeight = config.minHeight || 70
     config.minWidth = config.minWidth || 100
+
+    const container = document.createElement('div')
+    container.setAttribute('id', 'container')
+    container.style.position = "relative"
+    container.style.display = "flex"
+    container.style.justifyContent = "center"
+    container.style.alignItems = "center"
+    document.body.appendChild(container)
+    container.appendChild(img)
 
     img.insertAdjacentHTML('afterend', `
     <div id="area">
@@ -27,7 +36,6 @@ export const selectArea = (img: HTMLImageElement, config: Partial<SelectAreaConf
             </div>
         </div>
     `)
-    img.src = './src/front_chrome.png'
 
     const areaSelected = document.getElementById('areaSelected')
     const area = document.getElementById('area')
@@ -62,7 +70,7 @@ export const selectArea = (img: HTMLImageElement, config: Partial<SelectAreaConf
         height: areaSelected.clientHeight
     }
 
-    function setupResizeMouseDownEvent(e: MouseEvent, vector: ResizingVector = {x: 0, y: 0}) {
+    const setupResizeMouseDownEvent = (e: MouseEvent, vector: ResizingVector = {x: 0, y: 0}) => {
         if (areaSelected === null) {
             return
         }
@@ -163,4 +171,4 @@ export const selectArea = (img: HTMLImageElement, config: Partial<SelectAreaConf
     resizeAll.addEventListener('mousedown', e => setupResizeMouseDownEvent(e, {x: 1, y: 1}));
 }
 
-selectArea(document.getElementsByTagName('img')[0], {minHeight: 30})
+selectAreaImage(document.getElementsByTagName('img')[0], {minHeight: 30})

@@ -3,13 +3,19 @@
   "private": false,
   "version": "0.0.1",
   "type": "module",
-  "files": ["/dist"],
-  "main" : "./dist/main.umd.cjs",
-  "module": "dist/main.js",
-  "exports" : {
-    "." : {
-      "import" : "./dist/main.js",
-      "require" : "./dist/main.umd.cjs"
+  "files": [
+    "/dist"
+  ],
+  "main": "./dist/select-image-area.umd.cjs",
+  "module": "dist/select-image-area.js",
+  "exports": {
+    ".": {
+      "import": "./dist/select-image-area.js",
+      "require": "./dist/select-image-area.umd.cjs"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
     }
   },
   "scripts": {

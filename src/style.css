@@ -1,19 +1,15 @@
-#area {
-    background-color: red;
-    width: 500px;
-    height: 500px;
+.select-area-image__area {
+    background-color: rgba(56, 49, 49, 0.42);
     position: absolute;
     top: 0;
-    opacity: 0.5
 }
 
-#areaSelected {
+.select-area-image__areaSelected {
     position: absolute;
-    background-color: blue
+    background-color: rgba(0, 80, 255, 0.61)
 }
 
-
-#resizeRight {
+.select-area-image__resizeRight {
     position: absolute;
     bottom: 0;
     right: 0;
@@ -22,7 +18,7 @@
     cursor: ew-resize
 }
 
-#resizeLeft {
+.select-area-image__resizeLeft {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -31,7 +27,7 @@
     cursor: ew-resize
 }
 
-#resizeTop {
+.select-area-image__resizeTop {
     position: absolute;
     top: 0;
     left: 0;
@@ -40,7 +36,7 @@
     cursor: ns-resize
 }
 
-#resizeBottom {
+.select-area-image__resizeBottom {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -49,7 +45,7 @@
     cursor: ns-resize
 }
 
-#resizeAll {
+.select-area-image__resizeAll {
     position: absolute;
     bottom: -3px;
     right: -3px;

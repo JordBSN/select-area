@@ -9,49 +9,59 @@ interface ResizingVector {
 interface SelectAreaConfig {
     minHeight: number
     minWidth: number
+    coordinates: Coordinates
+    size: Size
+
 }
 
-export const selectAreaImage = (img: HTMLImageElement, config: Partial<SelectAreaConfig>) => {
+interface Coordinates {
+    x: number;
+    y: number;
+}
 
-    config.minHeight = config.minHeight || 70
-    config.minWidth = config.minWidth || 100
+interface Size {
+    w: number;
+    h: number;
+}
 
-    const container = document.createElement('div')
-    container.setAttribute('id', 'container')
-    container.style.position = "relative"
-    container.style.display = "flex"
-    container.style.justifyContent = "center"
-    container.style.alignItems = "center"
-    document.body.appendChild(container)
-    container.appendChild(img)
+interface EventDetail {
+    coordinates: Coordinates;
+    size: Size;
+}
+
+
+let instanceCount = 0
+
+export default function (img: HTMLImageElement, config: Partial<SelectAreaConfig> = {}) {
+
+    if (img.getAttribute('selectAreaImageInstance') !== null) {
+        return
+    }
+
+    img.setAttribute('selectAreaImageInstance', instanceCount.toString())
+
+    const buildSuffixedId = (element: string) => `${element}${instanceCount}`
+    const buildSuffixedElement = (element: string) => document.getElementById(buildSuffixedId(element))
 
     img.insertAdjacentHTML('afterend', `
-    <div id="area">
-            <div id="areaSelected" style="width: 150px;  height: 100px;top: 100px; left: 100px;">
-                <div id="resizeRight"></div>
-                <div id="resizeLeft"></div>
-                <div id="resizeTop"></div>
-                <div id="resizeBottom"></div>
-                <div id="resizeAll"></div>
+    <div id="${buildSuffixedId('area')}" class="select-area-image__area">
+            <div id="${buildSuffixedId('areaSelected')}" class="select-area-image__areaSelected">
+                <div id="${buildSuffixedId('resizeBottom')}" class="select-area-image__resizeBottom"></div>
+                <div id="${buildSuffixedId('resizeTop')}" class="select-area-image__resizeTop"></div>
+                <div id="${buildSuffixedId('resizeRight')}" class="select-area-image__resizeRight"></div>
+                <div id="${buildSuffixedId('resizeLeft')}" class="select-area-image__resizeLeft"></div>
+                <div id="${buildSuffixedId('resizeAll')}" class="select-area-image__resizeAll"></div>
             </div>
         </div>
     `)
 
-    const areaSelected = document.getElementById('areaSelected')
-    const area = document.getElementById('area')
-    const resizeBottom = document.getElementById("resizeBottom")
-    const resizeTop = document.getElementById("resizeTop")
-    const resizeRight = document.getElementById("resizeRight")
-    const resizeLeft = document.getElementById("resizeLeft")
-    const resizeAll = document.getElementById("resizeAll")
-    const minHeight = config.minHeight
-    const minWidth = config.minWidth
-    let resizingVector: ResizingVector = {x: 0, y: 0}
-    let isMoving = false
-    let initialMousePosition = {x: 0, y: 0}
-    let offsetX = 0
-    let offsetY = 0
-
+    const areaSelected = buildSuffixedElement('areaSelected')
+    const area = buildSuffixedElement('area')
+    const resizeBottom = buildSuffixedElement("resizeBottom")
+    const resizeTop = buildSuffixedElement("resizeTop")
+    const resizeRight = buildSuffixedElement("resizeRight")
+    const resizeLeft = buildSuffixedElement("resizeLeft")
+    const resizeAll = buildSuffixedElement("resizeAll")
 
     if (
         areaSelected === null ||
@@ -64,6 +74,52 @@ export const selectAreaImage = (img: HTMLImageElement, config: Partial<SelectAre
     ) {
         return
     }
+
+    const eventDetails = () => (<EventDetail>{
+        coordinates: {
+            x: areaSelected.offsetLeft,
+            y: areaSelected.offsetTop,
+        },
+        size: {
+            w: areaSelected.clientWidth,
+            h: areaSelected.clientHeight,
+        }
+    })
+
+    config.minHeight = config.minHeight || 70
+    config.minWidth = config.minWidth || 100
+
+    config.size = config.size || {
+        w: img.clientWidth * 0.5,
+        h: img.clientHeight * 0.25
+    }
+
+    config.coordinates = config.coordinates || {
+        x: 0,
+        y: 0
+    }
+
+    const minHeight = config.minHeight
+    const minWidth = config.minWidth
+    let resizingVector: ResizingVector = {x: 0, y: 0}
+    let isMoving = false
+    let initialMousePosition = {x: 0, y: 0}
+    let offsetX = 0
+    let offsetY = 0
+
+    area.style.width = img.clientWidth + 'px'
+    area.style.height = img.clientHeight + 'px'
+
+    config.size.w = clamp(config.size.w, 0, area.clientWidth)
+    config.size.h = clamp(config.size.h, 0, area.clientHeight)
+
+    config.coordinates.x = clamp(config.coordinates.x, 0, area.clientWidth - config.size.w)
+    config.coordinates.y = clamp(config.coordinates.y, 0, area.clientHeight - config.size.h)
+
+    areaSelected.style.left = config.coordinates.x + 'px'
+    areaSelected.style.top = config.coordinates.y + 'px'
+    areaSelected.style.width = config.size.w + 'px'
+    areaSelected.style.height = config.size.h + 'px'
 
     let initialAreaSelectedSize: { width: number, height: number } = {
         width: areaSelected.clientWidth,
@@ -82,6 +138,10 @@ export const selectAreaImage = (img: HTMLImageElement, config: Partial<SelectAre
         initialMousePosition = {x: e.clientX, y: e.clientY}
     }
 
+    const dispatchEvent = (name: 'moving' | 'resizing') => {
+        img.dispatchEvent(new CustomEvent<EventDetail>(name, {detail: eventDetails()}))
+    }
+
     const move = (e: MouseEvent) => {
         if (!isMoving) {
             return
@@ -93,6 +153,9 @@ export const selectAreaImage = (img: HTMLImageElement, config: Partial<SelectAre
 
         areaSelected.style.left = clamp(x, 0, area.clientWidth - areaSelected.clientWidth) + 'px'
         areaSelected.style.top = clamp(y, 0, area.clientHeight - areaSelected.clientHeight) + 'px'
+
+        dispatchEvent('moving')
+
     }
 
     const resize = (e: MouseEvent) => {
@@ -115,6 +178,8 @@ export const selectAreaImage = (img: HTMLImageElement, config: Partial<SelectAre
 
         areaSelected.style.width = clamp(width, minWidth, area.clientWidth - offsetWidth) + 'px'
         areaSelected.style.height = clamp(height, minHeight, area.clientHeight - offsetHeight) + 'px'
+
+        dispatchEvent('resizing')
 
     }
 
@@ -166,7 +231,10 @@ export const selectAreaImage = (img: HTMLImageElement, config: Partial<SelectAre
         areaSelected.style.top = ""
     })
 
+
     resizeRight.addEventListener('mousedown', e => setupResizeMouseDownEvent(e, {x: 1, y: 0}));
     resizeBottom.addEventListener('mousedown', e => setupResizeMouseDownEvent(e, {x: 0, y: 1}))
     resizeAll.addEventListener('mousedown', e => setupResizeMouseDownEvent(e, {x: 1, y: 1}));
+
+    instanceCount++
 }

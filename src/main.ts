@@ -1,88 +1,111 @@
 import './style.css'
-import {clamp} from './helpers'
-
-interface ResizingVector {
-    x: number,
-    y: number
-}
-
-interface SelectAreaConfig {
-    minHeight: number
-    minWidth: number
-    coordinates: Coordinates
-    size: Size
-
-}
-
-interface Coordinates {
-    x: number;
-    y: number;
-}
-
-interface Size {
-    w: number;
-    h: number;
-}
-
-interface EventDetail {
-    coordinates: Coordinates;
-    size: Size;
-}
-
+import {EventDetail, ResizingVector, SelectImageAreaConfig, SelectImageAreaElementsData} from "./types";
 
 let instanceCount = 0
 
-export default function (img: HTMLImageElement, config: Partial<SelectAreaConfig> = {}) {
+export default function (img: HTMLImageElement, config: Partial<SelectImageAreaConfig> = {}) {
 
-    if (img.getAttribute('selectAreaImageInstance') !== null) {
+    if (img.getAttribute('selectImageAreaInstance') !== null) {
         return
     }
 
-    img.setAttribute('selectAreaImageInstance', instanceCount.toString())
+    img.setAttribute('selectImageAreaInstance', instanceCount.toString())
 
-    const buildSuffixedId = (element: string) => `${element}${instanceCount}`
-    const buildSuffixedElement = (element: string) => document.getElementById(buildSuffixedId(element))
+    const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value))
+    const getWidth = (element: HTMLElement) => parseInt(getComputedStyle(element).width)
+    const getHeight = (element: HTMLElement) => parseInt(getComputedStyle(element).height)
+    const suffixWithInstanceCount = (id: string) => `select-image-area__${id}${instanceCount}`
+    const getElement = (element: string): HTMLElement => {
+        const el = document.getElementById(element);
+
+        if (el == null) {
+            throw `${element} cannot be null!`
+        }
+
+        return el
+    }
+
+    const elements: SelectImageAreaElementsData = {
+        area: {
+            id: suffixWithInstanceCount('area'),
+        },
+        areaSelected: {
+            id: suffixWithInstanceCount('area-selected'),
+        },
+        resizeHandles: {
+            resizeB: {
+                id: suffixWithInstanceCount('resize-b'),
+                vector: {x: 0, y: 1}
+            },
+            resizeT: {
+                id: suffixWithInstanceCount('resize-t'),
+                vector: {x: 0, y: -1}
+            },
+            resizeR: {
+                id: suffixWithInstanceCount('resize-r'),
+                vector: {x: 1, y: 0}
+            },
+            resizeL: {
+                id: suffixWithInstanceCount('resize-l'),
+                vector: {x: -1, y: 0}
+            },
+            resizeBL: {
+                id: suffixWithInstanceCount('resize-bl'),
+                vector: {x: -1, y: 1}
+            },
+            resizeBR: {
+                id: suffixWithInstanceCount('resize-br'),
+                vector: {x: 1, y: 1}
+            },
+            resizeTR: {
+                id: suffixWithInstanceCount('resize-tr'),
+                vector: {x: 1, y: -1}
+            },
+            resizeTL: {
+                id: suffixWithInstanceCount('resize-tl'),
+                vector: {x: -1, y: -1}
+            },
+        }
+    }
 
     img.insertAdjacentHTML('afterend', `
-    <div id="${buildSuffixedId('area')}" class="select-area-image__area">
-            <div id="${buildSuffixedId('areaSelected')}" class="select-area-image__areaSelected">
-                <div id="${buildSuffixedId('resizeBottom')}" class="select-area-image__resizeBottom"></div>
-                <div id="${buildSuffixedId('resizeTop')}" class="select-area-image__resizeTop"></div>
-                <div id="${buildSuffixedId('resizeRight')}" class="select-area-image__resizeRight"></div>
-                <div id="${buildSuffixedId('resizeLeft')}" class="select-area-image__resizeLeft"></div>
-                <div id="${buildSuffixedId('resizeAll')}" class="select-area-image__resizeAll"></div>
+    <div id="${elements.area.id}" style="background-color: rgba(0, 0, 0, 0.05); position: absolute; top: 0;">
+            <div id="${elements.areaSelected.id}" style="position: absolute; background-color: rgba(255, 255, 255, 0.70); border: 3px dashed black; box-sizing: border-box;">
+               
+                <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 100%;">
+                  <div style="position: relative; width: 100%; height: 1px;">
+                        <div id="${elements.resizeHandles.resizeTL.id}" class="select-image-area__resize-square" style=" left: -7px;  cursor: nwse-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeT.id}" class="select-image-area__resize-square" style=" right: 0; left: 0;  cursor: n-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeTR.id}" class="select-image-area__resize-square" style=" right: -7px;  cursor: nesw-resize;"></div>
+                    </div>
+                    
+                     <div style="position: relative; width: 100%; height: 1px;">
+                        <div id="${elements.resizeHandles.resizeL.id}" class="select-image-area__resize-square" style=" left: -7px;  cursor: w-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeR.id}" class="select-image-area__resize-square" style=" right: -7px;  cursor: e-resize;"></div>
+                    </div>
+                    
+                <div style="position: relative; width: 100%; height: 1px;">
+                        <div id="${elements.resizeHandles.resizeBL.id}" class="select-image-area__resize-square" style=" left: -7px;  cursor: nesw-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeB.id}" class="select-image-area__resize-square" style=" right: 0; left: 0;  cursor: s-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeBR.id}" class="select-image-area__resize-square" style=" right: -7px;  cursor: nwse-resize;"></div>
+                    </div>
+</div>
+                
             </div>
         </div>
     `)
 
-    const areaSelected = buildSuffixedElement('areaSelected')
-    const area = buildSuffixedElement('area')
-    const resizeBottom = buildSuffixedElement("resizeBottom")
-    const resizeTop = buildSuffixedElement("resizeTop")
-    const resizeRight = buildSuffixedElement("resizeRight")
-    const resizeLeft = buildSuffixedElement("resizeLeft")
-    const resizeAll = buildSuffixedElement("resizeAll")
+    const area = getElement(elements.area.id)
+    const areaSelected = getElement(elements.areaSelected.id)
 
-    if (
-        areaSelected === null ||
-        area === null ||
-        resizeBottom === null ||
-        resizeTop === null ||
-        resizeRight === null ||
-        resizeLeft === null ||
-        resizeAll === null
-    ) {
-        return
-    }
-
-    const eventDetails = () => (<EventDetail>{
+    const eventDetail = () => (<EventDetail>{
         coordinates: {
             x: areaSelected.offsetLeft,
             y: areaSelected.offsetTop,
         },
         size: {
-            w: areaSelected.clientWidth,
-            h: areaSelected.clientHeight,
+            w: getWidth(areaSelected),
+            h: getHeight(areaSelected),
         }
     })
 
@@ -90,8 +113,8 @@ export default function (img: HTMLImageElement, config: Partial<SelectAreaConfig
     config.minWidth = config.minWidth || 100
 
     config.size = config.size || {
-        w: img.clientWidth * 0.5,
-        h: img.clientHeight * 0.25
+        w: getWidth(img) * 0.5,
+        h: getHeight(img) * 0.25
     }
 
     config.coordinates = config.coordinates || {
@@ -107,14 +130,14 @@ export default function (img: HTMLImageElement, config: Partial<SelectAreaConfig
     let offsetX = 0
     let offsetY = 0
 
-    area.style.width = img.clientWidth + 'px'
-    area.style.height = img.clientHeight + 'px'
+    area.style.width = getWidth(img) + 'px'
+    area.style.height = getHeight(img) + 'px'
 
-    config.size.w = clamp(config.size.w, 0, area.clientWidth)
-    config.size.h = clamp(config.size.h, 0, area.clientHeight)
+    config.size.w = clamp(config.size.w, 0, getWidth(area))
+    config.size.h = clamp(config.size.h, 0, getHeight(area))
 
-    config.coordinates.x = clamp(config.coordinates.x, 0, area.clientWidth - config.size.w)
-    config.coordinates.y = clamp(config.coordinates.y, 0, area.clientHeight - config.size.h)
+    config.coordinates.x = clamp(config.coordinates.x, 0, getWidth(area) - config.size.w)
+    config.coordinates.y = clamp(config.coordinates.y, 0, getHeight(area) - config.size.h)
 
     areaSelected.style.left = config.coordinates.x + 'px'
     areaSelected.style.top = config.coordinates.y + 'px'
@@ -122,8 +145,8 @@ export default function (img: HTMLImageElement, config: Partial<SelectAreaConfig
     areaSelected.style.height = config.size.h + 'px'
 
     let initialAreaSelectedSize: { width: number, height: number } = {
-        width: areaSelected.clientWidth,
-        height: areaSelected.clientHeight
+        width: getWidth(areaSelected),
+        height: getHeight(areaSelected)
     }
 
     const setupResizeMouseDownEvent = (e: MouseEvent, vector: ResizingVector = {x: 0, y: 0}) => {
@@ -133,13 +156,28 @@ export default function (img: HTMLImageElement, config: Partial<SelectAreaConfig
 
         e.stopPropagation()
         resizingVector = vector
-        initialAreaSelectedSize.width = areaSelected.clientWidth
-        initialAreaSelectedSize.height = areaSelected.clientHeight
+
+        if (resizingVector.y < 0) {
+            let bottom = getHeight(area) - parseInt(areaSelected.style.top)
+            bottom -= getHeight(areaSelected)
+            areaSelected.style.bottom = bottom + 'px'
+            areaSelected.style.top = ""
+        }
+
+        if (resizingVector.x < 0) {
+            let right = getWidth(area) - parseInt(areaSelected.style.left)
+            right -= getWidth(areaSelected)
+            areaSelected.style.right = right + 'px'
+            areaSelected.style.left = ""
+        }
+
+        initialAreaSelectedSize.width = getWidth(areaSelected)
+        initialAreaSelectedSize.height = getHeight(areaSelected)
         initialMousePosition = {x: e.clientX, y: e.clientY}
     }
 
     const dispatchEvent = (name: 'moving' | 'resizing') => {
-        img.dispatchEvent(new CustomEvent<EventDetail>(name, {detail: eventDetails()}))
+        img.dispatchEvent(new CustomEvent<EventDetail>(name, {detail: eventDetail()}))
     }
 
     const move = (e: MouseEvent) => {
@@ -151,8 +189,8 @@ export default function (img: HTMLImageElement, config: Partial<SelectAreaConfig
         let x = e.clientX + offsetX - rect.left
         let y = e.clientY + offsetY - rect.top
 
-        areaSelected.style.left = clamp(x, 0, area.clientWidth - areaSelected.clientWidth) + 'px'
-        areaSelected.style.top = clamp(y, 0, area.clientHeight - areaSelected.clientHeight) + 'px'
+        areaSelected.style.left = clamp(x, 0, getWidth(area) - getWidth(areaSelected)) + 'px'
+        areaSelected.style.top = clamp(y, 0, getHeight(area) - getHeight(areaSelected)) + 'px'
 
         dispatchEvent('moving')
 
@@ -169,24 +207,18 @@ export default function (img: HTMLImageElement, config: Partial<SelectAreaConfig
         let offsetHeight = areaSelected.offsetTop
 
         if (resizingVector.x < 0) {
-            offsetWidth = area.clientWidth - areaSelected.clientWidth - offsetWidth
+            offsetWidth = getWidth(area) - getWidth(areaSelected) - offsetWidth
         }
 
         if (resizingVector.y < 0) {
-            offsetHeight = area.clientHeight - areaSelected.clientHeight - offsetHeight
+            offsetHeight = getHeight(area) - getHeight(areaSelected) - offsetHeight
         }
 
-        areaSelected.style.width = clamp(width, minWidth, area.clientWidth - offsetWidth) + 'px'
-        areaSelected.style.height = clamp(height, minHeight, area.clientHeight - offsetHeight) + 'px'
+        areaSelected.style.width = clamp(width, minWidth, getWidth(area) - offsetWidth) + 'px'
+        areaSelected.style.height = clamp(height, minHeight, getHeight(area) - offsetHeight) + 'px'
 
         dispatchEvent('resizing')
-
     }
-
-    document.body.addEventListener('mousemove', e => {
-        move(e)
-        resize(e)
-    })
 
     areaSelected.addEventListener('mousedown', e => {
         isMoving = true
@@ -195,46 +227,35 @@ export default function (img: HTMLImageElement, config: Partial<SelectAreaConfig
         offsetY = rect?.top - e.clientY
     })
 
-    document.body.addEventListener('mouseup', e => {
+    const cancelAction = () => {
         isMoving = false
 
-        let value = (parseInt(areaSelected.style.right) - area.clientWidth)
-        value += areaSelected.clientWidth
-        value *= resizingVector.x
-        areaSelected.style.left = value + 'px'
+        let left = (parseInt(areaSelected.style.right) - getWidth(area))
+        left += getWidth(areaSelected)
+        left *= resizingVector.x
+        areaSelected.style.left = left + 'px'
         areaSelected.style.right = ""
 
-        let top = (parseInt(areaSelected.style.bottom) - area.clientHeight)
-        top += areaSelected.clientHeight
+        let top = (parseInt(areaSelected.style.bottom) - getHeight(area))
+        top += getHeight(areaSelected)
         top *= resizingVector.y
         areaSelected.style.top = top + 'px'
         areaSelected.style.bottom = ""
 
         resizingVector = {x: 0, y: 0}
+    }
+
+    document.body.addEventListener('mouseup', cancelAction)
+    document.body.addEventListener('mouseleave', cancelAction)
+    document.body.addEventListener('mousemove', e => {
+        move(e)
+        resize(e)
     })
 
-    resizeLeft.addEventListener('mousedown', e => {
-        setupResizeMouseDownEvent(e, {x: -1, y: 0})
-
-        let value = area.clientWidth - parseInt(areaSelected.style.left)
-        value -= areaSelected.clientWidth
-        areaSelected.style.right = value + 'px'
-        areaSelected.style.left = ""
-    })
-
-    resizeTop.addEventListener('mousedown', e => {
-        setupResizeMouseDownEvent(e, {x: 0, y: -1})
-
-        let bottom = area.clientHeight - parseInt(areaSelected.style.top)
-        bottom -= areaSelected.clientHeight
-        areaSelected.style.bottom = bottom + 'px'
-        areaSelected.style.top = ""
-    })
-
-
-    resizeRight.addEventListener('mousedown', e => setupResizeMouseDownEvent(e, {x: 1, y: 0}));
-    resizeBottom.addEventListener('mousedown', e => setupResizeMouseDownEvent(e, {x: 0, y: 1}))
-    resizeAll.addEventListener('mousedown', e => setupResizeMouseDownEvent(e, {x: 1, y: 1}));
+    for (const handleName in elements.resizeHandles) {
+        const handle = elements.resizeHandles[handleName as keyof typeof elements.resizeHandles]
+        getElement(handle.id).addEventListener('mousedown', e => setupResizeMouseDownEvent(e, handle.vector))
+    }
 
     instanceCount++
 }

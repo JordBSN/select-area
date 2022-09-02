@@ -2,28 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="./src/style.css"/>
+    <link lang="scss" rel="stylesheet" href="./src/style.css"/>
     <title>Vite + TS</title>
 </head>
 <body style="position: relative; margin: auto; ">
 
 <div style="display: flex">
     <div style="margin-right: 20px">
-        <img id="image" src="/src/front_chrome.png"/>
+        <img id="image" src="/public/front_chrome.png"/>
     </div>
 
     <div>
-        <img id="imageb" src="/src/front_chrome.png"/>
+        <img id="imageb" src="/public/front_chrome.png"/>
     </div>
 </div>
 
 
 <script type="module">
-    import selectAreaImage from "./src/main.ts"
+    import selectImageArea from "./src/main.ts"
 const img = document.getElementById('image')
-    selectAreaImage(img, {
+    selectImageArea(img, {
         coordinates: {
           x: 1000,
           y: 1000
@@ -33,7 +32,7 @@ const img = document.getElementById('image')
             h: 2500
         }
     })
-    selectAreaImage(document.getElementById('imageb'))
+    selectImageArea(document.getElementById('imageb'))
 
 </script>
 <script>

@@ -1,13 +1,14 @@
 {
-  "name": "select-area-image",
+  "name": "select-image-area",
   "private": false,
   "version": "0.0.1",
   "type": "module",
   "files": [
     "/dist"
   ],
+  "types": "./src/types.d.ts",
   "main": "./dist/select-image-area.umd.cjs",
-  "module": "dist/select-image-area.js",
+  "module": "./dist/select-image-area.js",
   "exports": {
     ".": {
       "import": "./dist/select-image-area.js",
@@ -19,15 +20,18 @@
     }
   },
   "scripts": {
+    "test": "vitest",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^8.4.0",
+    "happy-dom": "^6.0.4",
+    "prettier": "^2.7.1",
+    "tslib": "^2.4.0",
     "typescript": "^4.6.4",
-    "vite": "^3.0.7"
-  },
-  "dependencies": {
-    "prettier": "^2.7.1"
+    "vite": "^3.0.7",
+    "vitest": "^0.22.1"
   }
 }

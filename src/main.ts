@@ -3,19 +3,20 @@ import {EventDetail, ResizingVector, SelectImageAreaConfig, SelectImageAreaEleme
 
 let instanceCount = 0
 
-export default function (img: HTMLImageElement, config: Partial<SelectImageAreaConfig> = {}) {
+export default function (target: HTMLElement, config: Partial<SelectImageAreaConfig> = {}) {
 
-    if (img.getAttribute('selectImageAreaInstance') !== null) {
+    if (target.getAttribute('selectImageAreaInstance') !== null) {
         return
     }
 
-    img.setAttribute('selectImageAreaInstance', instanceCount.toString())
+    target.setAttribute('selectImageAreaInstance', instanceCount.toString())
 
     const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value))
     const getWidth = (element: HTMLElement) => parseInt(getComputedStyle(element).width)
     const getHeight = (element: HTMLElement) => parseInt(getComputedStyle(element).height)
     const suffixWithInstanceCount = (id: string) => `select-image-area__${id}${instanceCount}`
     const getElement = (element: string): HTMLElement => {
+
         const el = document.getElementById(element);
 
         if (el == null) {
@@ -68,26 +69,26 @@ export default function (img: HTMLImageElement, config: Partial<SelectImageAreaC
         }
     }
 
-    img.insertAdjacentHTML('afterend', `
+    target.insertAdjacentHTML('afterend', `
     <div id="${elements.area.id}" style="background-color: rgba(0, 0, 0, 0.05); position: absolute; top: 0;">
             <div id="${elements.areaSelected.id}" style="position: absolute; background-color: rgba(255, 255, 255, 0.70); border: 3px dashed black; box-sizing: border-box;">
                
                 <div style="display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 100%;">
                   <div style="position: relative; width: 100%; height: 1px;">
-                        <div id="${elements.resizeHandles.resizeTL.id}" class="select-image-area__resize-square" style=" left: -7px;  cursor: nwse-resize;"></div>
-                        <div id="${elements.resizeHandles.resizeT.id}" class="select-image-area__resize-square" style=" right: 0; left: 0;  cursor: n-resize;"></div>
-                        <div id="${elements.resizeHandles.resizeTR.id}" class="select-image-area__resize-square" style=" right: -7px;  cursor: nesw-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeTL.id}" class="select-image-area__resize-handle" style=" left: -7px;  cursor: nwse-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeT.id}" class="select-image-area__resize-handle" style=" right: 0; left: 0;  cursor: n-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeTR.id}" class="select-image-area__resize-handle" style=" right: -7px;  cursor: nesw-resize;"></div>
                     </div>
                     
                      <div style="position: relative; width: 100%; height: 1px;">
-                        <div id="${elements.resizeHandles.resizeL.id}" class="select-image-area__resize-square" style=" left: -7px;  cursor: w-resize;"></div>
-                        <div id="${elements.resizeHandles.resizeR.id}" class="select-image-area__resize-square" style=" right: -7px;  cursor: e-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeL.id}" class="select-image-area__resize-handle" style=" left: -7px;  cursor: w-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeR.id}" class="select-image-area__resize-handle" style=" right: -7px;  cursor: e-resize;"></div>
                     </div>
                     
                 <div style="position: relative; width: 100%; height: 1px;">
-                        <div id="${elements.resizeHandles.resizeBL.id}" class="select-image-area__resize-square" style=" left: -7px;  cursor: nesw-resize;"></div>
-                        <div id="${elements.resizeHandles.resizeB.id}" class="select-image-area__resize-square" style=" right: 0; left: 0;  cursor: s-resize;"></div>
-                        <div id="${elements.resizeHandles.resizeBR.id}" class="select-image-area__resize-square" style=" right: -7px;  cursor: nwse-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeBL.id}" class="select-image-area__resize-handle" style=" left: -7px;  cursor: nesw-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeB.id}" class="select-image-area__resize-handle" style=" right: 0; left: 0;  cursor: s-resize;"></div>
+                        <div id="${elements.resizeHandles.resizeBR.id}" class="select-image-area__resize-handle" style=" right: -7px;  cursor: nwse-resize;"></div>
                     </div>
 </div>
                 
@@ -113,14 +114,15 @@ export default function (img: HTMLImageElement, config: Partial<SelectImageAreaC
     config.minWidth = config.minWidth || 100
 
     config.size = config.size || {
-        w: getWidth(img) * 0.5,
-        h: getHeight(img) * 0.25
+        w: getWidth(target) * 0.5,
+        h: getHeight(target) * 0.25
     }
 
     config.coordinates = config.coordinates || {
         x: 0,
         y: 0
     }
+
 
     const minHeight = config.minHeight
     const minWidth = config.minWidth
@@ -130,8 +132,8 @@ export default function (img: HTMLImageElement, config: Partial<SelectImageAreaC
     let offsetX = 0
     let offsetY = 0
 
-    area.style.width = getWidth(img) + 'px'
-    area.style.height = getHeight(img) + 'px'
+    area.style.width = getWidth(target) + 'px'
+    area.style.height = getHeight(target) + 'px'
 
     config.size.w = clamp(config.size.w, 0, getWidth(area))
     config.size.h = clamp(config.size.h, 0, getHeight(area))
@@ -177,7 +179,7 @@ export default function (img: HTMLImageElement, config: Partial<SelectImageAreaC
     }
 
     const dispatchEvent = (name: 'moving' | 'resizing') => {
-        img.dispatchEvent(new CustomEvent<EventDetail>(name, {detail: eventDetail()}))
+        target.dispatchEvent(new CustomEvent<EventDetail>(name, {detail: eventDetail()}))
     }
 
     const move = (e: MouseEvent) => {

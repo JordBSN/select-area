@@ -1,42 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link lang="scss" rel="stylesheet" href="./src/style.css"/>
-    <title>Vite + TS</title>
-</head>
-<body style="position: relative; margin: auto; ">
-
-<div style="display: flex">
-    <div style="margin-right: 20px">
-        <img id="image" src="/public/front_chrome.png"/>
-    </div>
-
-    <div>
-        <img id="imageb" src="/public/front_chrome.png"/>
-    </div>
+<html>
+<body>
+<div style="width: 800px; height: 800px;">
+    <img id="image" src="/front_chrome.png" />
 </div>
-
 
 <script type="module">
     import selectImageArea from "./src/main.ts"
-const img = document.getElementById('image')
-    selectImageArea(img, {
-        coordinates: {
-          x: 1000,
-          y: 1000
-        },
-        size: {
-            w: 2500,
-            h: 2500
-        }
-    })
-    selectImageArea(document.getElementById('imageb'))
-
-</script>
-<script>
-
+    selectImageArea(document.getElementById('image'))
 </script>
 </body>
 </html>

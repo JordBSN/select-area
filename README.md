@@ -1,6 +1,6 @@
 # How to use?
 
-### With npm or yarn
+### With npm
 
 ```bash
 npm i select-image-area

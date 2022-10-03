@@ -3,8 +3,6 @@
 ### With npm or yarn
 
 ```bash
-yarn add select-image-area
-
 npm i select-image-area
 ```
 

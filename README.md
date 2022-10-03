@@ -11,7 +11,11 @@ npm i multi-select-areas-image
 ### Exemple for Vue.js 2.0
 
 ```html
-<img ref="img" @moving="getEventDataArea" @resizing="getEventDataArea" :src="image.url" alt="">
+<template>
+    <div>
+        <img ref="img" @moving="getEventDataArea" @resizing="getEventDataArea" :src="image.url" alt="">
+    </div>
+</template
 
 <script>
     import selectImageArea from "./src/main.ts"
@@ -33,9 +37,7 @@ npm i multi-select-areas-image
                 this.area = {coordinates: {...e.detail.coordinates}, size: {...e.detail.size}}
             },
         }
-
 </script>
-
 ```
 
 ### Configuration

@@ -26,7 +26,7 @@ npm i multi-select-areas-image
 
         methods: {
             selectArea() {
-                selectImageArea(this.$refs.img, {...this.engraving_area})
+                selectImageArea(this.$refs.img, {...this.area})
             },
 
             getEventDataArea(e) {

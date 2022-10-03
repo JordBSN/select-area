@@ -3,9 +3,9 @@
 ### With npm or yarn
 
 ```bash
-yarn add multi-select-areas-image
+yarn add select-image-area
 
-npm i multi-select-areas-image
+npm i select-image-area
 ```
 
 ### Exemple for Vue.js 2.0
